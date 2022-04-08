@@ -1,10 +1,5 @@
 #!/bin/bash
 
-echo "export DB_HOST=${DB_HOST}" >> .env
-echo "export DB_PORT=${DB_PORT}" >> .env
-echo "export DB_USER=${DB_USER}" >> .env
-echo "export DB_PASS=${DB_PASS}" >> .env
-
 for _schema in $(echo ${DB_SCHEMAS} | sed "s/,/ /g")
 do
 	mkdir -p /db-dumps/${_schema}
@@ -14,7 +9,7 @@ do
 	sed -i 's/DB_USER_R/'${DB_USER}'/g' ${_schema}-dump.sh
 	sed -i 's/DB_PASS_R/'${DB_PASS}'/g' ${_schema}-dump.sh
 	sed -i 's/SCHEMA_R/'${_schema}'/g' ${_schema}-dump.sh
-    echo "* * * * * /usr/src/app/${_schema}-dump.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/${_schema}-dump-cron
+    echo "0 3 * * * /usr/src/app/${_schema}-dump.sh >> /var/log/cron.log 2>&1" > /etc/cron.d/${_schema}-dump-cron
     echo "#" >> /etc/cron.d/${_schema}-dump-cron
     chmod 0644 /etc/cron.d/${_schema}-dump-cron
     crontab /etc/cron.d/${_schema}-dump-cron
